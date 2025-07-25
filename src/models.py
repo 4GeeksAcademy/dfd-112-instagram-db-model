@@ -18,15 +18,15 @@ db = SQLAlchemy()
 """
 TO-DOs:
 
-[] Create tables for Instagram model:
+[x] Create tables for Instagram model:
 
     [x] User
-    [] Follower --> renamed as "Follow"
-    [] Comment
-    [] Post
-    [] Media
+    [x] Follower --> renamed as "Follow"
+    [x] Comment
+    [x] Post
+    [x] Media
 
-    [] MediaType (Enum) for Enum datatype
+[???] Create MediaType (Enum) for Enum datatype
 """
 
 
@@ -260,10 +260,10 @@ TO-DO's:
 
     [x] created_at
 
-[] Create Relations
-    [] with Comment
-    [] with User
-    [] with MEdia
+[x] Create Relations
+    [x] with User
+    [x] with Comment
+    [x] with Media
 
 [x] Create serialization
 """
