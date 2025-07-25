@@ -5,11 +5,8 @@ from datetime import datetime, timezone
 import enum
 from sqlalchemy.dialects.postgresql import ENUM as PGEnum
 
+Base = declarative_base()
 
-# Base = declarative_base() # ----> I cannot make this work
-
-db = SQLAlchemy()
-# class User(db.Model):
 
 #########################################################################################
 #########################################################################################
@@ -57,7 +54,7 @@ TO-DO's:
 
 [x] Create serialization
 """
-class User(db.Model):
+class User(Base):
     __tablename__ = "user"
 
     ### ATRIBUTES ###
@@ -141,7 +138,7 @@ TO-DO's:
 
 [x] Create serialization
 """
-class Follow(db.Model):
+class Follow(Base):
     __tablename__ = "follow"
 
 
@@ -209,7 +206,7 @@ TO-DO's:
 
 [x] Create serialization
 """
-class Comment(db.Model):
+class Comment(Base):
     __tablename__ = "comment"
 
     ### ATRIBUTES ###
@@ -270,7 +267,7 @@ TO-DO's:
 
 [x] Create serialization
 """
-class Post(db.Model):
+class Post(Base):
     __tablename__ = "post"
 
     ### ATRIBUTES ###
@@ -340,18 +337,17 @@ Con el tipo "mediatype" con enum (enumaración) da error, no sé cómo arreglarl
 ### Media type for the "enum" data type
 # class MediaType(str, Enum):  # -------> Apparently wrong syntax
 # class MediaType(enum.Enum):
-#     IMAGE = "image"
-#     VIDEO = "video"
+    # IMAGE = "image"
+    # VIDEO = "video"
 
 ############################################################
-class Media(db.Model):
+class Media(Base):
     __tablename__ = "media"
 
     ### ATRIBUTES ###
 
     id:       Mapped[int]        = mapped_column(                   primary_key=True)
     # type:     Mapped[MediaType]  = mapped_column(  PGEnum(MediaType, name="mediatype", create_type=True),  nullable=False)  ### -------> DA ERROR
-    # type:     Mapped[MediaType]
     url:      Mapped[str]        = mapped_column(  String(255),                                           nullable=False)
     post_id:  Mapped[int]        = mapped_column(                   ForeignKey("post.id"),                nullable=False)
 
