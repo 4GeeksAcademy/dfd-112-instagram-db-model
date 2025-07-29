@@ -1,9 +1,11 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import String, Boolean, ForeignKey, Enum, CheckConstraint, PrimaryKeyConstraint, DateTime # "ForeignKey", "Enum", "CheckConstraint", "PrimaryKeyConstraint" imported
+from sqlalchemy import Enum, String, Boolean, ForeignKey, Enum, CheckConstraint, PrimaryKeyConstraint, DateTime # "ForeignKey", "Enum", "CheckConstraint", "PrimaryKeyConstraint" imported
 from sqlalchemy.orm import Mapped, mapped_column, relationship, declarative_base
 from datetime import datetime, timezone
 import enum
-from sqlalchemy.dialects.postgresql import ENUM as PGEnum
+# from enum import Enum
+# from sqlalchemy.dialects.postgresql import ENUM as PGEnum
+# from sqlalchemy.types import Enum as SQLAlchemyEnum
 
 
 # Base = declarative_base() # ----> I cannot make this work
@@ -29,7 +31,7 @@ TO-DOs:
     [x] Post
     [x] Media
 
-[???] Create MediaType (Enum) for Enum datatype
+[x] Create MediaType (Enum) for using in Media.type
 """
 
 
@@ -50,8 +52,8 @@ TO-DO's:
     [x] email
 
 [x] Create Relations
-    [x] with Follower, relating "user_from_id"
-    [x] with Follower, relating "user_to_id"
+    [x] with Follow, relating "user_from_id"
+    [x] with Follow, relating "user_to_id"
     [x] with Comment
     [x] with Post
 
@@ -67,21 +69,20 @@ class User(db.Model):
     first_name: Mapped[str]  = mapped_column( String(40),                     nullable=False)
     last_name:  Mapped[str]  = mapped_column( String(40),                     nullable=False)
     email:      Mapped[str]  = mapped_column( String(60),  unique=True,       nullable=False)
-
     password:   Mapped[str]  = mapped_column( String(40),                     nullable=False)
     is_active:  Mapped[bool] = mapped_column( Boolean(),   default=True,      nullable=False)
 
 
     ### RELATIONS ###
 
-    # with Follower --> Users this user follows
+    # with Follow --> Users this user follows
     following: Mapped[list["Follow"]] = relationship(
         "Follow",
         foreign_keys="Follow.user_from_id",
         back_populates="follower"
         )
     
-    # with Follower --> Users following this user
+    # with Follow --> Users following this user
     followers: Mapped[list["Follow"]] = relationship(
         "Follow",
         foreign_keys="Follow.user_to_id",
@@ -260,7 +261,6 @@ TO-DO's:
 [x] Create Atributes:
     [x] id
     [x] user_id
-
     [x] created_at
 
 [x] Create Relations
@@ -301,6 +301,7 @@ class Post(db.Model):
         )
 
 
+    ### SERIALIZATION ###
 
     def serialize(self):
         return {
@@ -318,13 +319,13 @@ class Post(db.Model):
 """
 TO-DO's:
 
-[x] Name the table with "__tablename__ ="
-
 [x] Create "MediaType" class for Enum data type
 
-[] Create Atributes:
+[x] Name the table with "__tablename__ ="
+
+[x] Create Atributes:
     [x] id
-    [] type ----------------------------------------------------> NO HE PODIDO HACER QUE FUNCIONE
+    [x] type -----------------------------------> COULD NOT MAKE IT WORK WITH ENUM TYPE, changed to a string
     [x] url
     [x] post_id
 
@@ -335,13 +336,13 @@ TO-DO's:
 """
 ############################################################
 """
-Con el tipo "mediatype" con enum (enumaración) da error, no sé cómo arreglarlo, así que lo quito para que no salte error al hager el "diagram.png"
+With the type "mediatype" with enum (enumeration) it gives an error, I don't know how to fix it, I am removing it so that the error doesn't appear when creating the "diagram.png"
 """
 ### Media type for the "enum" data type
-# class MediaType(str, Enum):  # -------> Apparently wrong syntax
 # class MediaType(enum.Enum):
-#     IMAGE = "image"
-#     VIDEO = "video"
+#     IMAGE   = "image"
+#     VIDEO   = "video"
+#     PENDING = "pending"
 
 ############################################################
 class Media(db.Model):
@@ -350,8 +351,10 @@ class Media(db.Model):
     ### ATRIBUTES ###
 
     id:       Mapped[int]        = mapped_column(                   primary_key=True)
-    # type:     Mapped[MediaType]  = mapped_column(  PGEnum(MediaType, name="mediatype", create_type=True),  nullable=False)  ### -------> DA ERROR
-    # type:     Mapped[MediaType]
+    # type:     Mapped[MediaType]  = mapped_column( Enum(MediaType),                                        nullable=False)  ### -------------------------->  OUTPUTS ERROR WHEN CREATING TABLE
+    # type:     Mapped[MediaType]  = mapped_column( PGEnum(MediaType, name="mediatype", create_type=True),  nullable=False)  ### -------------------------->  OUTPUTS ERROR WHEN CREATING TABLE
+    # type:     Mapped[MediaType]  = mapped_column( SQLAlchemyEnum(MediaType, name="media_type"), default=MediaType.PENDING,  nullable=False) ### --------->  OUTPUTS ERROR WHEN CREATING TABLE
+    type:     Mapped[str]        = mapped_column(  String(40),                                            nullable=False)
     url:      Mapped[str]        = mapped_column(  String(255),                                           nullable=False)
     post_id:  Mapped[int]        = mapped_column(                   ForeignKey("post.id"),                nullable=False)
 
@@ -370,7 +373,7 @@ class Media(db.Model):
     def serialize(self):
         return {
             "id":       self.id,
-            # "type":     self.type.value,  ### ----------------------->  DA ERROR CON TIPO ENUM MEDIATYPE
+            "type":     self.type,
             "url":      self.url,
             "post_id":  self.post_id,
         }

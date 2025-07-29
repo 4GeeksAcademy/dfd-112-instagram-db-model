@@ -1,6 +1,6 @@
 ---
 
-<p align="center"><img src="src/DIAGRAMS/ALMOST_diagram.png" alt="API Documentation"></p>
+<p align="center"><img src="src/DIAGRAMS/FINAL_diagram.png" alt="API Documentation"></p>
 
 ---
 
