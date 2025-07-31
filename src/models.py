@@ -1,11 +1,11 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Enum, String, Boolean, ForeignKey, Enum, CheckConstraint, PrimaryKeyConstraint, DateTime # "ForeignKey", "Enum", "CheckConstraint", "PrimaryKeyConstraint" imported
+from sqlalchemy import String, Boolean, ForeignKey, Enum as SQLEnum, CheckConstraint, PrimaryKeyConstraint, DateTime # "ForeignKey", "Enum", "CheckConstraint", "PrimaryKeyConstraint" imported
 from sqlalchemy.orm import Mapped, mapped_column, relationship, declarative_base
 from datetime import datetime, timezone
-import enum
-# from enum import Enum
-# from sqlalchemy.dialects.postgresql import ENUM as PGEnum
-# from sqlalchemy.types import Enum as SQLAlchemyEnum
+
+from enum import Enum
+from sqlalchemy.dialects.postgresql import ENUM as PGEnum
+from sqlalchemy.types import Enum as SQLAlchemyEnum
 
 
 # Base = declarative_base() # ----> I cannot make this work
@@ -325,7 +325,7 @@ TO-DO's:
 
 [x] Create Atributes:
     [x] id
-    [x] type -----------------------------------> COULD NOT MAKE IT WORK WITH ENUM TYPE, changed to a string
+    [x] type --------------> COULD MAKE IT WORK WITH ENUM TYPE, changed to a string if needed in the future
     [x] url
     [x] post_id
 
@@ -336,13 +336,13 @@ TO-DO's:
 """
 ############################################################
 """
-With the type "mediatype" with enum (enumeration) it gives an error, I don't know how to fix it, I am removing it so that the error doesn't appear when creating the "diagram.png"
+With the type "mediatype" with enum (enumeration) it gave an error, solved by using Python Enum on the class, and SQL Alchemy Enum on the atribute.
 """
 ### Media type for the "enum" data type
-# class MediaType(enum.Enum):
-#     IMAGE   = "image"
-#     VIDEO   = "video"
-#     PENDING = "pending"
+class MediaType(Enum):
+    IMAGE   = "image"
+    VIDEO   = "video"
+    PENDING = "pending"
 
 ############################################################
 class Media(db.Model):
@@ -350,13 +350,11 @@ class Media(db.Model):
 
     ### ATRIBUTES ###
 
-    id:       Mapped[int]        = mapped_column(                   primary_key=True)
-    # type:     Mapped[MediaType]  = mapped_column( Enum(MediaType),                                        nullable=False)  ### -------------------------->  OUTPUTS ERROR WHEN CREATING TABLE
-    # type:     Mapped[MediaType]  = mapped_column( PGEnum(MediaType, name="mediatype", create_type=True),  nullable=False)  ### -------------------------->  OUTPUTS ERROR WHEN CREATING TABLE
-    # type:     Mapped[MediaType]  = mapped_column( SQLAlchemyEnum(MediaType, name="media_type"), default=MediaType.PENDING,  nullable=False) ### --------->  OUTPUTS ERROR WHEN CREATING TABLE
-    type:     Mapped[str]        = mapped_column(  String(40),                                            nullable=False)
-    url:      Mapped[str]        = mapped_column(  String(255),                                           nullable=False)
-    post_id:  Mapped[int]        = mapped_column(                   ForeignKey("post.id"),                nullable=False)
+    id:       Mapped[int]        = mapped_column(                    primary_key=True)
+    type:     Mapped[MediaType]  = mapped_column( SQLEnum (MediaType, name="super_enum"),        nullable=False)
+    # type:   Mapped[str]        = mapped_column( String(40),                                    nullable=False) ---> This one is just in case enum does not work
+    url:      Mapped[str]        = mapped_column( String(255),                                   nullable=False)
+    post_id:  Mapped[int]        = mapped_column(                   ForeignKey("post.id"),       nullable=False)
 
 
     ### RELATIONS ###
@@ -380,4 +378,13 @@ class Media(db.Model):
 
 
 
+#####################################################################
+## Failed attempts at creating enum type (finally done)
+
+# Atributes
+
+    # type:  Mapped[MediaType] = mapped_column( Enum(MediaType),                                        nullable=False)  ### ----->  OUTPUTS ERROR WHEN CREATING TABLE
+    # type:  Mapped[MediaType] = mapped_column( PGEnum(MediaType, name="mediatype", create_type=True),  nullable=False)  ### ----->  OUTPUTS ERROR WHEN CREATING TABLE
+    # type:  Mapped[MediaType] = mapped_column( SQLAlchemyEnum(MediaType, name="media_type"),           nullable=False)  ### ----->  OUTPUTS ERROR WHEN CREATING TABLE
+#####################################################################
 
