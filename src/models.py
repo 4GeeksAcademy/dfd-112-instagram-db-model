@@ -351,7 +351,7 @@ class Media(db.Model):
     ### ATRIBUTES ###
 
     id:       Mapped[int]        = mapped_column(                    primary_key=True)
-    type:     Mapped[MediaType]  = mapped_column( SQLEnum (MediaType, name="enum_mediatype"),        nullable=False)
+    type:     Mapped[MediaType]  = mapped_column( SQLEnum (MediaType, name="enum_mediatype"),    nullable=False)
     # type:   Mapped[str]        = mapped_column( String(40),                                    nullable=False) ---> This one is just in case enum does not work
     url:      Mapped[str]        = mapped_column( String(255),                                   nullable=False)
     post_id:  Mapped[int]        = mapped_column(                   ForeignKey("post.id"),       nullable=False)
